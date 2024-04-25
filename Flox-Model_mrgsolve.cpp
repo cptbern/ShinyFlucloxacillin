@@ -1,4 +1,3 @@
-floxjointmap <- '
 $PROB
 # Joint model unbound (cmt=1) and total (cmt=2)
 
@@ -64,4 +63,3 @@ double DV = PAR;
 if(self.cmt == 2) DV = MET;
 
 $CAPTURE DV PAR MET VCi CLi KBi
-'

@@ -1,0 +1,49 @@
+---
+title: "Example_run_Flox"
+author: "VS"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(mrgsolve)
+library(tidyverse)
+library(mapbayr)
+
+model <- mread_cache("Flox-Model_mrgsolve")
+
+```
+
+```{r}
+# set up dosing table
+dosing <- data.frame(ID = rep(1:1000), #how often do you want to repeat the simulation
+                     time = 0, #starting time
+                     amt = 2000, #dose in mg
+                     cmt = 1, # compartment where dose is added to
+                     evid = 1, #event
+                     tinf=0.5, #duration of infusion in h
+                     ii=6, #interdose interval
+                     addl=7, #number of additional doses
+                     GFR=70, #eGFR-GC ml/min
+                     ALB=20) #albumin in g/L
+
+# convert dosing table in mrgsolve event
+e <- as.ev(dosing)
+
+#run model
+df.mrg <- model %>% ev(e) %>% mrgsim(obsonly=TRUE)
+
+#obtain data
+df.test <- df.mrg@data
+```
+
+```{r}
+#plot mean curve of simulations
+ggplot(df.test %>% 
+         group_by(time) %>% 
+         mutate(mean = mean(DV)) %>% 
+         slice(1) %>% 
+         ungroup())+
+  geom_line(aes(time, mean, group=ID))
+```
+
